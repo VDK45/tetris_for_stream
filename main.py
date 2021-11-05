@@ -12,7 +12,6 @@ import pyperclip
 thread1 = threading.Thread(target=server.run, args=())
 thread1.start()
 
-
 file = open('ip_server.txt', 'r')
 line = file.readline()
 file.close()
@@ -35,7 +34,9 @@ def client_send(mes):
     sock.close()
 
 
-# client_send('test')
+def test():
+    client_send('test')
+    print(f'Connected to ip {ip}')
 
 
 def resource_path(relative_path):
@@ -61,7 +62,7 @@ pygame.font.init()
 shrift = resource_path('font/comicsansms3.ttf')
 my_font = pygame.font.Font(shrift, 30)
 win = pygame.display.set_mode((750, 940))  # Размер окна
-pygame.display.set_caption("Голосуем за")  # Название окна
+pygame.display.set_caption("Tetris twitch play")  # Название окна
 pygame.font.init()
 tf2build_font1 = resource_path('font/tf2build.ttf')
 tf2secondary_font1 = resource_path('font/tf2secondary.ttf')
@@ -338,18 +339,20 @@ def ip_server():
         pygame.display.update()
         clock.tick(FPS)
 
+
 def joystick():
+    win = pygame.display.set_mode((750, 400))
     global FPS
     click = False
     while True:
         win.fill(gray)
         mx, my = pygame.mouse.get_pos()
 
-        button_1 = pygame.Rect(150, 100, 100, 100)
-        button_2 = pygame.Rect(150, 300, 100, 100)
-        button_3 = pygame.Rect(50, 200, 100, 100)
-        button_4 = pygame.Rect(250, 200, 100, 100)
-        button_5 = pygame.Rect(450, 300, 200, 100)
+        button_1 = pygame.Rect(150, 50, 100, 100)
+        button_2 = pygame.Rect(150, 250, 100, 100)
+        button_3 = pygame.Rect(50, 150, 100, 100)
+        button_4 = pygame.Rect(250, 150, 100, 100)
+        button_5 = pygame.Rect(450, 250, 200, 100)
 
         if button_1.collidepoint((mx, my)):
             if click:
@@ -419,11 +422,11 @@ def joystick():
                         click = True
                         client_send('!space')
 
-        draw_text('w', font_menu, (255, 255, 255), win, 185, 135)
-        draw_text('s', font_menu, (255, 255, 255), win, 185, 335)
-        draw_text('a', font_menu, (255, 255, 255), win, 85, 235)
-        draw_text('d', font_menu, (255, 255, 255), win, 285, 235)
-        draw_text('Space', font_menu, (255, 255, 255), win, 500, 335)
+        draw_text('w', font_menu, (255, 255, 255), win, 185, 85)
+        draw_text('s', font_menu, (255, 255, 255), win, 185, 285)
+        draw_text('a', font_menu, (255, 255, 255), win, 85, 185)
+        draw_text('d', font_menu, (255, 255, 255), win, 285, 185)
+        draw_text('Space', font_menu, (255, 255, 255), win, 500, 285)
         pygame.display.update()
         clock.tick(FPS)
 
@@ -431,6 +434,7 @@ def joystick():
 def main_menu():
     global FPS
     click = False
+    win = pygame.display.set_mode((750, 940))
     while True:
 
         win.fill(gray)
@@ -503,4 +507,5 @@ def main_menu():
         clock.tick(FPS)
 
 
+test()
 main_menu()
