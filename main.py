@@ -4,6 +4,38 @@ import sys
 import webbrowser
 from copy import deepcopy
 from random import choice, randrange
+import threading
+import server
+import socket
+import pyperclip
+
+thread1 = threading.Thread(target=server.run, args=())
+thread1.start()
+
+
+file = open('ip_server.txt', 'r')
+line = file.readline()
+file.close()
+ip = line
+print(f'Connecting to: {ip}')
+
+
+def client_send(mes):
+    global ip
+    mes = mes.encode('utf-8')
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        sock.connect((ip, 4545))
+        sock.send(mes)  # send byte
+    except (TimeoutError, OSError) as err:
+        print("Не удалось установить соединение.")
+        print("Проверьте IP адрес!")
+        sock.close()
+        ip_server()
+    sock.close()
+
+
+# client_send('test')
 
 
 def resource_path(relative_path):
@@ -23,6 +55,7 @@ gray = (120, 120, 120)
 red = (255, 0, 0)
 green = (0, 255, 0)
 blue = (0, 0, 255)
+
 pygame.init()
 pygame.font.init()
 shrift = resource_path('font/comicsansms3.ttf')
@@ -116,18 +149,36 @@ def play():
         for i in range(lines):
             pygame.time.wait(200)
         # control
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                exit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
+        for even in pygame.event.get():
+            if even.type == pygame.QUIT:
+                server.status = False
+                server.stop()
+                pygame.quit()
+                sys.exit()
+
+            if even.type == pygame.KEYDOWN:
+                if even.key == pygame.K_LEFT:
                     dx = -1
-                elif event.key == pygame.K_RIGHT:
+                elif even.key == pygame.K_RIGHT:
                     dx = 1
-                elif event.key == pygame.K_DOWN:
+                elif even.key == pygame.K_DOWN:
                     anim_limit = 100
-                elif event.key == pygame.K_UP:
+                elif even.key == pygame.K_UP:
                     rotate = True
+                if even.key == pygame.K_a:
+                    dx = -1
+                elif even.key == pygame.K_d:
+                    dx = 1
+                elif even.key == pygame.K_s:
+                    anim_limit = 100
+                elif even.key == pygame.K_w:
+                    rotate = True
+                elif even.key == pygame.K_SPACE:
+                    rotate = True
+
+            if even.type == pygame.KEYUP:
+                if even.key == pygame.K_ESCAPE:
+                    main_menu()
         # move x
         figure_old = deepcopy(figure)
 
@@ -219,12 +270,162 @@ def play():
         clock.tick(FPS)
 
 
-def ip():
-    pass
+def ip_server():
+    global FPS
+    global ip
+    font = pygame.font.Font(tf2build_font1, 30)
+    # clock = pygame.time.Clock()
+    input_box = pygame.Rect(100, 150, 140, 32)
+    color_inactive = pygame.Color('lightskyblue3')
+    color_active = pygame.Color('dodgerblue2')
+    color = color_inactive
+    active = False
 
+    while True:
+        win.fill(gray)
+
+        keys_pres = pygame.key.get_pressed()
+        for even in pygame.event.get():
+            if even.type == pygame.QUIT:
+                pygame.quit()
+                server.status = False
+                server.stop()
+                sys.exit()
+            if keys_pres[pygame.K_ESCAPE]:
+                server.stop()
+                main_menu()
+
+            if even.type == pygame.MOUSEBUTTONDOWN:
+                # If the user clicked on the input_box rect.
+                if input_box.collidepoint(even.pos):
+                    ip = pyperclip.paste()  # Paste copy
+                    text_hind = ''
+                    f = open('ip_server.txt', 'w+')
+                    f.write(f'{ip}')
+                    f.close()
+                    # Toggle the active variable.
+                    active = not active
+                else:
+                    active = False
+                # Change the current color of the input box.
+                color = color_active if active else color_inactive
+            if even.type == pygame.KEYDOWN:
+                if even.key == pygame.K_RETURN:
+                    f = open('ip_server.txt', 'w+')
+                    f.write(f'{ip}')
+                    f.close()
+                    print(ip)
+                    ip = ''
+                elif even.key == pygame.K_BACKSPACE:
+                    ip = ip[:-1]
+                else:
+                    ip += even.unicode
+        # Render the current text.
+        txt_surface = font.render(ip, True, color)
+        # Resize the box if the text is too long.
+        width = max(200, txt_surface.get_width() + 10)
+        input_box.w = width
+        # Blit the text.
+        win.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
+        # Blit the input_box rect.
+        pygame.draw.rect(win, color, input_box, 2)
+        draw_text('Enter ip stream and restart app!', font, (0, 0, 0), win, 50, 50)
+        draw_text('Введите ip стримера', font, (0, 0, 0), win, 50, 90)
+        draw_text('И перезагрузить программу!', font, (0, 0, 0), win, 50, 250)
+        draw_text('ESC для выхода из программы', font, (0, 0, 0), win, 50, 300)
+        draw_text('IP:', font, (0, 0, 0), win, 50, 155)
+
+        pygame.display.update()
+        clock.tick(FPS)
 
 def joystick():
-    pass
+    global FPS
+    click = False
+    while True:
+        win.fill(gray)
+        mx, my = pygame.mouse.get_pos()
+
+        button_1 = pygame.Rect(150, 100, 100, 100)
+        button_2 = pygame.Rect(150, 300, 100, 100)
+        button_3 = pygame.Rect(50, 200, 100, 100)
+        button_4 = pygame.Rect(250, 200, 100, 100)
+        button_5 = pygame.Rect(450, 300, 200, 100)
+
+        if button_1.collidepoint((mx, my)):
+            if click:
+                print('w')
+        if button_2.collidepoint((mx, my)):
+            if click:
+                print('s')
+        if button_3.collidepoint((mx, my)):
+            if click:
+                print('a')
+        if button_4.collidepoint((mx, my)):
+            if click:
+                print('d')
+        if button_5.collidepoint((mx, my)):
+            if click:
+                print('Space')
+        pygame.draw.rect(win, blue, button_1)
+        pygame.draw.rect(win, blue, button_2)
+        pygame.draw.rect(win, blue, button_3)
+        pygame.draw.rect(win, blue, button_4)
+        pygame.draw.rect(win, blue, button_5)
+        click = False
+        keys_pres = pygame.key.get_pressed()
+        for even in pygame.event.get():
+            if even.type == pygame.QUIT:
+                pygame.quit()
+                server.status = False
+                server.stop()
+                sys.exit()
+            if even.type == pygame.KEYDOWN:
+                if even.key == pygame.K_a:
+                    client_send('!left')
+                    print('a')
+                elif even.key == pygame.K_d:
+                    client_send('!right')
+                    print('d')
+                elif even.key == pygame.K_s:
+                    client_send('!down')
+                    print('s')
+                elif even.key == pygame.K_w:
+                    client_send('!up')
+                    print('w')
+                elif even.key == pygame.K_SPACE:
+                    client_send('!space')
+                    print('space')
+            if keys_pres[pygame.K_ESCAPE]:
+                main_menu()
+            if even.type == pygame.MOUSEBUTTONDOWN:
+                if button_1.collidepoint(even.pos):
+                    if even.button == 1:
+                        click = True
+                        client_send('!up')
+                if button_2.collidepoint(even.pos):
+                    if even.button == 1:
+                        click = True
+                        client_send('!down')
+                if button_3.collidepoint(even.pos):
+                    if even.button == 1:
+                        click = True
+                        client_send('!left')
+                if button_4.collidepoint(even.pos):
+                    if even.button == 1:
+                        click = True
+                        client_send('!right')
+                if button_5.collidepoint(even.pos):
+                    if even.button == 1:
+                        click = True
+                        client_send('!space')
+
+        draw_text('w', font_menu, (255, 255, 255), win, 185, 135)
+        draw_text('s', font_menu, (255, 255, 255), win, 185, 335)
+        draw_text('a', font_menu, (255, 255, 255), win, 85, 235)
+        draw_text('d', font_menu, (255, 255, 255), win, 285, 235)
+        draw_text('Space', font_menu, (255, 255, 255), win, 500, 335)
+        pygame.display.update()
+        clock.tick(FPS)
 
 
 def main_menu():
@@ -268,31 +469,28 @@ def main_menu():
         for even in pygame.event.get():
             if even.type == pygame.QUIT:
                 pygame.quit()
+                server.status = False
+                server.stop()
                 sys.exit()
             if keys_pres[pygame.K_ESCAPE]:
                 play()
             if even.type == pygame.MOUSEBUTTONDOWN:
                 if button_1.collidepoint(even.pos):
-                    print('ok')
                     if even.button == 1:
                         click = True
                         play()
                 if button_2.collidepoint(even.pos):
-                    print('ok')
                     if even.button == 1:
                         click = True
-                        ip()
+                        ip_server()
                 if button_3.collidepoint(even.pos):
-                    print('ok')
                     if even.button == 1:
                         click = True
                         joystick()
                 if button_4.collidepoint(even.pos):
-                    print('ok')
                     if even.button == 1:
                         click = True
                 if button_5.collidepoint(even.pos):
-                    print('ok')
                     if even.button == 1:
                         click = True
 
