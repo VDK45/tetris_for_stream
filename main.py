@@ -49,7 +49,8 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 
-FPS = 60
+# game option
+FPS = 15
 white = (255, 255, 255)
 black = (0, 0, 0)
 gray = (120, 120, 120)
@@ -104,6 +105,7 @@ def play():
     field = [[0 for i in range(W)] for j in range(H)]
     anim_count, anim_speed, anim_limit = 0, 60, 2000
     bg = pygame.image.load('img/bg.jpg').convert()
+
     game_bg = pygame.image.load('img/bg2.jpg').convert()
 
     main_font = pygame.font.Font('font/font.ttf', 65)
@@ -113,7 +115,7 @@ def play():
     title_score = font.render('score:', True, pygame.Color('green'))
     title_record = font.render('record:', True, pygame.Color('purple'))
 
-    get_color = lambda: (randrange(30, 256), randrange(30, 256), randrange(30, 256))
+    get_color = lambda: (randrange(100, 256), randrange(100, 200), randrange(100, 256))
 
     figure, next_figure = deepcopy(choice(figures)), deepcopy(choice(figures))
     color, next_color = get_color(), get_color()
@@ -181,8 +183,7 @@ def play():
             if even.type == pygame.KEYUP:
                 if even.key == pygame.K_ESCAPE:
                     main_menu()
-        # soket control
-        # print(mess)
+        # socket control
         if server.message == b'!down':
             anim_limit = 100
             server.message = b''
@@ -378,8 +379,6 @@ def ip_server():
         draw_text(ok_text, font, red, win, 50, 300)
         draw_text('Мой IP', font, white, win, 150, 510)
         draw_text('IP:', font, (0, 0, 0), win, 50, 155)
-
-
 
         pygame.display.update()
         clock.tick(FPS)
