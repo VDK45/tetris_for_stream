@@ -292,6 +292,7 @@ def play():
 def ip_server():
     global FPS
     global ip
+    click = False
     win = pygame.display.set_mode((750, 940))
     font = pygame.font.Font(tf2build_font1, 30)
     # clock = pygame.time.Clock()
@@ -300,9 +301,23 @@ def ip_server():
     color_active = pygame.Color('dodgerblue2')
     color = color_inactive
     active = False
+    ok_text = ''
 
     while True:
         win.fill(gray)
+
+        # button_my_ip
+        mx, my = pygame.mouse.get_pos()
+        button_my_ip = pygame.Rect(50, 500, 350, 50)
+        if button_my_ip.collidepoint((mx, my)):
+            if click:
+                print(' VDK45 IP')
+                ip = 'vdk45.ddns.net'
+                f = open('ip_server.txt', 'w+')
+                f.write(f'{ip}')
+                f.close()
+        pygame.draw.rect(win, blue, button_my_ip)
+        click = False
 
         keys_pres = pygame.key.get_pressed()
         for even in pygame.event.get():
@@ -316,6 +331,9 @@ def ip_server():
                 main_menu()
 
             if even.type == pygame.MOUSEBUTTONDOWN:
+                if button_my_ip.collidepoint(even.pos):
+                    if even.button == 1:
+                        click = True
                 # If the user clicked on the input_box rect.
                 if input_box.collidepoint(even.pos):
                     ip = pyperclip.paste()  # Paste copy
@@ -325,8 +343,10 @@ def ip_server():
                     f.close()
                     # Toggle the active variable.
                     active = not active
+                    ok_text = 'ESC Для выхода'
                 else:
                     active = False
+                    ok_text = 'ESC Для выхода'
                 # Change the current color of the input box.
                 color = color_active if active else color_inactive
             if even.type == pygame.KEYDOWN:
@@ -336,10 +356,13 @@ def ip_server():
                     f.close()
                     print(ip)
                     ip = ''
+                    ok_text = 'ESC Для выхода'
                 elif even.key == pygame.K_BACKSPACE:
                     ip = ip[:-1]
                 else:
                     ip += even.unicode
+                    ok_text = 'ESC Для выхода'
+
         # Render the current text.
         txt_surface = font.render(ip, True, color)
         # Resize the box if the text is too long.
@@ -352,8 +375,11 @@ def ip_server():
         draw_text('Enter ip stream and restart app!', font, (0, 0, 0), win, 50, 50)
         draw_text('Введите ip стримера', font, (0, 0, 0), win, 50, 90)
         draw_text('И перезагрузить программу!', font, (0, 0, 0), win, 50, 250)
-        draw_text('ESC для выхода из программы', font, (0, 0, 0), win, 50, 300)
+        draw_text(ok_text, font, red, win, 50, 300)
+        draw_text('Мой IP', font, white, win, 150, 510)
         draw_text('IP:', font, (0, 0, 0), win, 50, 155)
+
+
 
         pygame.display.update()
         clock.tick(FPS)
@@ -388,8 +414,6 @@ def joystick():
         if button_5.collidepoint((mx, my)):
             if click:
                 print('Space')
-                print(type(server.message))
-                print(server.message)
         pygame.draw.rect(win, blue, button_1)
         pygame.draw.rect(win, blue, button_2)
         pygame.draw.rect(win, blue, button_3)
