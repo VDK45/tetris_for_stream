@@ -81,6 +81,7 @@ def draw_text(text, font, color, surface, x, y):
 
 
 def play():
+    global mess
     W, H = 10, 20
     TILE = 45
     GAME_RES = W * TILE, H * TILE
@@ -180,6 +181,23 @@ def play():
             if even.type == pygame.KEYUP:
                 if even.key == pygame.K_ESCAPE:
                     main_menu()
+        # soket control
+        # print(mess)
+        if server.message == b'!down':
+            anim_limit = 100
+            server.message = b''
+        if server.message == b'!left':
+            dx = -1
+            server.message = b''
+        if server.message == b'!right':
+            dx = 1
+            server.message = b''
+        if server.message == b'!up':
+            rotate = True
+            server.message = b''
+        if server.message == b'!space':
+            rotate = True
+            server.message = b''
         # move x
         figure_old = deepcopy(figure)
 
@@ -369,6 +387,8 @@ def joystick():
         if button_5.collidepoint((mx, my)):
             if click:
                 print('Space')
+                print(type(server.message))
+                print(server.message)
         pygame.draw.rect(win, blue, button_1)
         pygame.draw.rect(win, blue, button_2)
         pygame.draw.rect(win, blue, button_3)
