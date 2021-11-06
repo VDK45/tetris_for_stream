@@ -3,7 +3,7 @@ import time
 import socket
 
 status = True
-message = ''
+message = b''
 
 
 def run():
@@ -26,7 +26,7 @@ def run():
             message = client.recv(1024)
             client.close()
             print(f'IP: {addr}')
-            print('Message: ',  message.decode('utf-8'))
+            print('Message: ', message.decode('utf-8'))
 
 
 def stop():
@@ -39,6 +39,3 @@ def stop():
     sock.close()
     status = False
     sys.exit()
-
-
-
