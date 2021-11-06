@@ -11,7 +11,7 @@ def run():
     global message
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind(('0.0.0.0', 4545))
-    sock.listen(5)  # Сколько соединения
+    sock.listen(50)  # Сколько соединения
     while status:
         if status == False:
             print('Server stop')
