@@ -35,7 +35,7 @@ def client_send(mes):
 
 
 def test():
-    client_send('test')
+    client_send('Test connect')
     print(f'Connected to ip {ip}')
 
 
@@ -292,6 +292,7 @@ def play():
 def ip_server():
     global FPS
     global ip
+    win = pygame.display.set_mode((750, 940))
     font = pygame.font.Font(tf2build_font1, 30)
     # clock = pygame.time.Clock()
     input_box = pygame.Rect(100, 150, 140, 32)
