@@ -11,12 +11,14 @@ import pyperclip
 
 thread1 = threading.Thread(target=server.run, args=())
 thread1.start()
-
-file = open('ip_server.txt', 'r')
-line = file.readline()
-file.close()
-ip = line
-print(f'Connecting to: {ip}')
+try:
+    file = open('ip_server.txt', 'r')
+    line = file.readline()
+    file.close()
+    ip = line
+    print(f'Connecting to: {ip}')
+except FileNotFoundError:
+    ip = 'vdk45.ddns.net'
 
 
 def client_send(mes):
@@ -35,6 +37,7 @@ def client_send(mes):
 
 
 def test():
+    print('Conecting to server')
     client_send('Test connect')
     print(f'Connected to ip {ip}')
 
@@ -48,6 +51,9 @@ def resource_path(relative_path):
 
     return os.path.join(base_path, relative_path)
 
+
+icon_win = resource_path('img/icon.png')
+pygame.display.set_icon(pygame.image.load(icon_win))
 
 # game option
 FPS = 15
@@ -92,30 +98,31 @@ def play():
 
     grid = [pygame.Rect(x * TILE, y * TILE, TILE, TILE) for x in range(W) for y in range(H)]
 
-    figures_pos = [[(-1, 0), (-2, 0), (0, 0), (1, 0)],
-                   [(0, -1), (-1, -1), (-1, 0), (0, 0)],
-                   [(-1, 0), (-1, 1), (0, 0), (0, -1)],
-                   [(0, 0), (-1, 0), (0, 1), (-1, -1)],
-                   [(0, 0), (0, -1), (0, 1), (-1, -1)],
-                   [(0, 0), (0, -1), (0, 1), (1, -1)],
-                   [(0, 0), (0, -1), (0, 1), (-1, 0)]]
+    figures_pos = [[(-1, 0), (-2, 0), (0, 0), (1, 0)],  # Палка
+                   [(0, -1), (-1, -1), (-1, 0), (0, 0)],  # Квадрат
+                   [(-1, 0), (-1, 1), (0, 0), (0, -1)],  # Z
+                   [(0, 0), (-1, 0), (0, 1), (-1, -1)],  # S
+                   [(0, 0), (0, -1), (0, 1), (-1, -1)],  # 7
+                   [(0, 0), (0, -1), (0, 1), (1, -1)],  # Г
+                   [(0, 0), (0, -1), (0, 1), (-1, 0)]]  # т
 
     figures = [[pygame.Rect(x + W // 2, y + 1, 1, 1) for x, y in fig_pos] for fig_pos in figures_pos]
     figure_rect = pygame.Rect(0, 0, TILE - 2, TILE - 2)
     field = [[0 for i in range(W)] for j in range(H)]
     anim_count, anim_speed, anim_limit = 0, 60, 2000
-    bg = pygame.image.load('img/bg.jpg').convert()
+    bg = resource_path('img/bg2_green.jpg')
+    game_bg = pygame.image.load(bg).convert()
 
-    game_bg = pygame.image.load('img/bg2.jpg').convert()
+    font_ttf = resource_path('font/font.ttf')
+    main_font = pygame.font.Font(font_ttf, 65)
 
-    main_font = pygame.font.Font('font/font.ttf', 65)
-    font = pygame.font.Font('font/font.ttf', 45)
+    font = pygame.font.Font(font_ttf, 45)
 
     title_tetris = main_font.render('TETRIS', True, pygame.Color('darkorange'))
     title_score = font.render('score:', True, pygame.Color('green'))
     title_record = font.render('record:', True, pygame.Color('purple'))
 
-    get_color = lambda: (randrange(100, 256), randrange(100, 200), randrange(100, 256))
+    get_color = lambda: (randrange(30, 256), randrange(0, 10), randrange(30, 256))
 
     figure, next_figure = deepcopy(choice(figures)), deepcopy(choice(figures))
     color, next_color = get_color(), get_color()
@@ -146,7 +153,8 @@ def play():
     while True:
         record = get_record()
         dx, rotate = 0, False
-        sc.blit(bg, (0, 0))
+        # sc.blit(bg, (0, 0))
+        sc.fill((0, 255, 0))
         sc.blit(game_sc, (20, 20))
         game_sc.blit(game_bg, (0, 0))
         # delay for full lines
@@ -203,7 +211,6 @@ def play():
         figure_old = deepcopy(figure)
 
         for i in range(4):
-
             figure[i].x += dx
             if not check_borders():
                 figure = deepcopy(figure_old)
@@ -225,6 +232,7 @@ def play():
         # rotate
         center = figure[0]
         figure_old = deepcopy(figure)
+
         if rotate:
             for i in range(4):
                 x = figure[i].y - center.y
@@ -250,7 +258,7 @@ def play():
         # compute score
         score += scores[lines]
         # draw grid
-        [pygame.draw.rect(game_sc, (40, 40, 40), i_rect, 1) for i_rect in grid]
+        [pygame.draw.rect(game_sc, (0, 0, 0), i_rect, 1) for i_rect in grid]
         # draw figure
         for i in range(4):
             figure_rect.x = figure[i].x * TILE
@@ -506,7 +514,7 @@ def main_menu():
         if button_5.collidepoint((mx, my)):
             if click:
                 print('download')
-                webbrowser.open('https://cloud.mail.ru/public/BHJJ/6djS1G3qZ')
+                webbrowser.open('https://cloud.mail.ru/public/tLP4/AqunGUtGG')
         pygame.draw.rect(win, blue, button_1)
         pygame.draw.rect(win, (20, 120, 120), button_2)
         pygame.draw.rect(win, (20, 120, 120), button_3)
