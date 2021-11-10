@@ -204,7 +204,8 @@ def play():
         if server.message == b'!up':
             rotate = True
             server.message = b''
-        if server.message == b'!space':
+        if server.message == b'!jump':
+            print(type(server.message))
             rotate = True
             server.message = b''
         # move x
@@ -448,7 +449,7 @@ def joystick():
                     client_send('!up')
                     print('w')
                 elif even.key == pygame.K_SPACE:
-                    client_send('!space')
+                    client_send('!jump')
                     print('space')
             if keys_pres[pygame.K_ESCAPE]:
                 main_menu()
@@ -472,7 +473,7 @@ def joystick():
                 if button_5.collidepoint(even.pos):
                     if even.button == 1:
                         click = True
-                        client_send('!space')
+                        client_send('!jump')
 
         draw_text('w', font_menu, (255, 255, 255), win, 185, 85)
         draw_text('s', font_menu, (255, 255, 255), win, 185, 285)
